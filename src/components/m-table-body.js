@@ -1,7 +1,5 @@
 /* eslint-disable no-unused-vars */
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableRow from '@material-ui/core/TableRow';
+import { TableBody, TableCell, TableRow, Divider } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import * as React from 'react';
 /* eslint-enable no-unused-vars */
@@ -39,6 +37,38 @@ class MTableBody extends React.Component {
         </React.Fragment>
       );
     }
+  }
+
+
+  renderFooterRows(renderData) {
+    return renderData.map((data, index) => {
+        return (
+          <this.props.components.FooterRow
+            components={this.props.components}
+            icons={this.props.icons}
+            data={data}
+            index={index}
+            key={"row-" + data.tableData.id}
+            level={0}
+            options={this.props.options}
+            localization={{ ...MTableBody.defaultProps.localization.editRow, ...this.props.localization.editRow }}
+            onRowSelected={this.props.onRowSelected}
+            actions={this.props.actions}
+            columns={this.props.columns}
+            getFieldValue={this.props.getFieldValue}
+            detailPanel={this.props.detailPanel}
+            path={[index + this.props.pageSize * this.props.currentPage]}
+            onToggleDetailPanel={this.props.onToggleDetailPanel}
+            onRowClick={this.props.onRowClick}
+            isTreeData={this.props.isTreeData}
+            onTreeExpandChanged={this.props.onTreeExpandChanged}
+            onEditingCanceled={this.props.onEditingCanceled}
+            onEditingApproved={this.props.onEditingApproved}
+            hasAnyEditingRow={this.props.hasAnyEditingRow}
+            treeDataMaxLevel={this.props.treeDataMaxLevel}
+          />
+        );
+      });
   }
 
   renderUngroupedRows(renderData) {
@@ -192,11 +222,8 @@ class MTableBody extends React.Component {
           />
         }
         {this.renderEmpty(emptyRowCount, renderData)}
-
-        {this.props.footerData && (groups.length > 0 ?
-          this.renderGroupedRows(groups, this.props.footerData) :
-          this.renderUngroupedRows(this.props.footerData)
-        )}
+        
+        {this.props.footerData && this.renderFooterRows(this.props.footerData)}
       </TableBody>
     );
   }

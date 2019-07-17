@@ -87,7 +87,12 @@ class App extends Component {
                   options={{
                     rowStyle: rowData => ({
                       backgroundColor: (this.state.selectedRow && this.state.selectedRow.tableData.id === rowData.tableData.id) ? '#EEE' : '#FFF'
-                    })
+                    }),
+                    footerStyle: {
+                      backgroundColor: '#EEE',
+                      borderTop: "2px black solid",
+                      fontWeight: 'bold'
+                    }
                   }}
                 />
               </Grid>

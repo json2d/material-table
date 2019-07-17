@@ -39,6 +39,7 @@ export const defaultProps = {
     OverlayLoading: OverlayLoading,
     Pagination: TablePagination,
     Row: MComponents.MTableBodyRow,
+    FooterRow: MComponents.MTableBodyFooterRow,
     Toolbar: MComponents.MTableToolbar
   },
   data: [],
