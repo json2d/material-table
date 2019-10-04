@@ -1,11 +1,14 @@
 /* eslint-disable no-unused-vars */
-import { TableBody, TableCell, TableRow, Divider } from '@material-ui/core';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableRow from '@material-ui/core/TableRow';
 import PropTypes from 'prop-types';
 import * as React from 'react';
 /* eslint-enable no-unused-vars */
 
 class MTableBody extends React.Component {
   renderEmpty(emptyRowCount, renderData) {
+    const rowHeight = this.props.options.padding === 'default' ? 49 : 36;
     const localization = { ...MTableBody.defaultProps.localization, ...this.props.localization };
     if (this.props.options.showEmptyDataSourceMessage && renderData.length === 0) {
       let addColumn = 0;
@@ -19,7 +22,7 @@ class MTableBody extends React.Component {
         addColumn++;
       }
       return (
-        <TableRow style={{ height: 49 * (this.props.options.paging && this.props.options.emptyRowsWhenPaging ? this.props.pageSize : 1) }} key={'empty-' + 0} >
+        <TableRow style={{ height: rowHeight * (this.props.options.paging && this.props.options.emptyRowsWhenPaging ? this.props.pageSize : 1) }} key={'empty-' + 0} >
           <TableCell style={{ paddingTop: 0, paddingBottom: 0, textAlign: 'center' }} colSpan={this.props.columns.length + addColumn} key="empty-">
             {localization.emptyDataSourceMessage}
           </TableCell>
@@ -28,7 +31,7 @@ class MTableBody extends React.Component {
     } else if (this.props.options.emptyRowsWhenPaging) {
       return (
         <React.Fragment>
-          {[...Array(emptyRowCount)].map((r, index) => <TableRow style={{ height: 49 }} key={'empty-' + index} />)}
+          {[...Array(emptyRowCount)].map((r, index) => <TableRow style={{ height: rowHeight }} key={'empty-' + index} />)}
           {emptyRowCount > 0 && <TableRow style={{ height: 1 }} key={'empty-last1'} />}
         </React.Fragment>
       );
@@ -75,6 +78,7 @@ class MTableBody extends React.Component {
             detailPanel={this.props.detailPanel}
             onEditingCanceled={this.props.onEditingCanceled}
             onEditingApproved={this.props.onEditingApproved}
+            getFieldValue={this.props.getFieldValue}
           />
         );
       }
@@ -133,6 +137,7 @@ class MTableBody extends React.Component {
         options={this.props.options}
         isTreeData={this.props.isTreeData}
         hasAnyEditingRow={this.props.hasAnyEditingRow}
+        localization={{ ...MTableBody.defaultProps.localization.editRow, ...this.props.localization.editRow }}
       />
     ));
   }
@@ -158,7 +163,6 @@ class MTableBody extends React.Component {
             actionsColumnIndex={this.props.options.actionsColumnIndex}
             onFilterChanged={this.props.onFilterChanged}
             selection={this.props.options.selection}
-            onFilterSelectionChanged={this.props.onFilterSelectionChanged}
             localization={{ ...MTableBody.defaultProps.localization.filterRow, ...this.props.localization.filterRow }}
             hasDetailPanel={!!this.props.detailPanel}
             isTreeData={this.props.isTreeData}
@@ -180,6 +184,7 @@ class MTableBody extends React.Component {
             detailPanel={this.props.detailPanel}
             onEditingCanceled={this.props.onEditingCanceled}
             onEditingApproved={this.props.onEditingApproved}
+            getFieldValue={this.props.getFieldValue}
           />
         }
 
@@ -202,6 +207,7 @@ class MTableBody extends React.Component {
             detailPanel={this.props.detailPanel}
             onEditingCanceled={this.props.onEditingCanceled}
             onEditingApproved={this.props.onEditingApproved}
+            getFieldValue={this.props.getFieldValue}
           />
         }
         {this.renderEmpty(emptyRowCount, renderData)}
@@ -245,7 +251,6 @@ MTableBody.propTypes = {
   selection: PropTypes.bool.isRequired,
   showAddRow: PropTypes.bool,
   treeDataMaxLevel: PropTypes.number,
-  onFilterSelectionChanged: PropTypes.func.isRequired,
   localization: PropTypes.object,
   onFilterChanged: PropTypes.func,
   onGroupExpandChanged: PropTypes.func,

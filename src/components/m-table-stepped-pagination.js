@@ -1,5 +1,9 @@
 /* eslint-disable no-unused-vars */
-import { Icon, IconButton, withStyles, Tooltip, Hidden, Typography, Button } from '@material-ui/core';
+import IconButton from '@material-ui/core/IconButton';
+import withStyles from '@material-ui/core/styles/withStyles';
+import Tooltip from '@material-ui/core/Tooltip';
+import Hidden from '@material-ui/core/Hidden';
+import Button from '@material-ui/core/Button';
 import PropTypes from 'prop-types';
 import * as React from 'react';
 /* eslint-enable no-unused-vars */
@@ -38,11 +42,12 @@ class MTablePaginationInner extends React.Component {
           size="small"
           style={{
             boxShadow: 'none',
-            maxWidth: '30px', maxHeight: '30px', minWidth: '30px', minHeight: '30px'            
+            maxWidth: '30px', maxHeight: '30px', minWidth: '30px', minHeight: '30px'
           }}
           disabled={p === this.props.page}
           variant={buttonVariant}
           onClick={this.handleNumberButtonClick(p)}
+          key={p}
         >
           {p + 1}
         </Button>
@@ -97,7 +102,7 @@ const actionsStyles = theme => ({
   root: {
     flexShrink: 0,
     color: theme.palette.text.secondary,
-    marginLeft: theme.spacing.unit * 2.5
+    marginLeft: theme.spacing(2.5)
   }
 });
 

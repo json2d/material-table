@@ -1,5 +1,8 @@
 import React from 'react';
-import { CircularProgress, Icon, Paper, TablePagination } from '@material-ui/core';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Icon from '@material-ui/core/Icon';
+import Paper from '@material-ui/core/Paper';
+import TablePagination from '@material-ui/core/TablePagination';
 import * as MComponents from './components';
 import PropTypes from 'prop-types';
 import { fade } from '@material-ui/core/styles/colorManipulator';
@@ -15,7 +18,7 @@ OverlayLoading.propTypes = {
   theme: PropTypes.any
 };
 
-const Container = (props) => <Paper {...props}/>;
+const Container = (props) => <Paper elevation={2} {...props} />;
 
 export const defaultProps = {
   actions: [],
@@ -43,23 +46,23 @@ export const defaultProps = {
   data: [],
   icons: {
     /* eslint-disable react/display-name */
-    Add: (props) => <Icon {...props}>add_box</Icon>,
-    Check: (props) => <Icon {...props}>check</Icon>,
-    Clear: (props) => <Icon {...props}>clear</Icon>,
-    Delete: (props) => <Icon {...props}>delete_outline</Icon>,
-    DetailPanel: (props) => <Icon {...props}>chevron_right</Icon>,
-    Edit: (props) => <Icon {...props}>edit</Icon>,
-    Export: (props) => <Icon {...props}>save_alt</Icon>,
-    Filter: (props) => <Icon {...props}>filter_list</Icon>,
-    FirstPage: (props) => <Icon {...props}>first_page</Icon>,
-    LastPage: (props) => <Icon {...props}>last_page</Icon>,
-    NextPage: (props) => <Icon {...props}>chevron_right</Icon>,
-    PreviousPage: (props) => <Icon {...props}>chevron_left</Icon>,
-    ResetSearch: (props) => <Icon {...props}>clear</Icon>,
-    Search: (props) => <Icon {...props}>search</Icon>,
-    SortArrow: (props) => <Icon {...props}>arrow_upward</Icon>,
-    ThirdStateCheck: (props) => <Icon {...props}>remove</Icon>,
-    ViewColumn: (props) => <Icon {...props}>view_column</Icon>
+    Add: React.forwardRef((props, ref) => <Icon {...props} ref={ref}>add_box</Icon>),
+    Check: React.forwardRef((props, ref) => <Icon {...props} ref={ref}>check</Icon>),
+    Clear: React.forwardRef((props, ref) => <Icon {...props} ref={ref}>clear</Icon>),
+    Delete: React.forwardRef((props, ref) => <Icon {...props} ref={ref}>delete_outline</Icon>),
+    DetailPanel: React.forwardRef((props, ref) => <Icon {...props} ref={ref}>chevron_right</Icon>),
+    Edit: React.forwardRef((props, ref) => <Icon {...props} ref={ref}>edit</Icon>),
+    Export: React.forwardRef((props, ref) => <Icon {...props} ref={ref}>save_alt</Icon>),
+    Filter: React.forwardRef((props, ref) => <Icon {...props} ref={ref}>filter_list</Icon>),
+    FirstPage: React.forwardRef((props, ref) => <Icon {...props} ref={ref}>first_page</Icon>),
+    LastPage: React.forwardRef((props, ref) => <Icon {...props} ref={ref}>last_page</Icon>),
+    NextPage: React.forwardRef((props, ref) => <Icon {...props} ref={ref}>chevron_right</Icon>),
+    PreviousPage: React.forwardRef((props, ref) => <Icon {...props} ref={ref}>chevron_left</Icon>),
+    ResetSearch: React.forwardRef((props, ref) => <Icon {...props} ref={ref}>clear</Icon>),
+    Search: React.forwardRef((props, ref) => <Icon {...props} ref={ref}>search</Icon>),
+    SortArrow: React.forwardRef((props, ref) => <Icon {...props} ref={ref}>arrow_downward</Icon>),
+    ThirdStateCheck: React.forwardRef((props, ref) => <Icon {...props} ref={ref}>remove</Icon>),
+    ViewColumn: React.forwardRef((props, ref) => <Icon {...props} ref={ref}>view_column</Icon>)
     /* eslint-enable react/display-name */
   },
   isLoading: false,
@@ -78,11 +81,13 @@ export const defaultProps = {
     filtering: false,
     header: true,
     loadingType: 'overlay',
+    padding: 'default',
     paging: true,
     pageSize: 5,
     pageSizeOptions: [5, 10, 20],
     paginationType: 'normal',
     showEmptyDataSourceMessage: true,
+    showFirstLastPageButtons: true,
     showSelectAllCheckbox: true,
     search: true,
     showTitle: true,
@@ -91,6 +96,7 @@ export const defaultProps = {
     searchFieldAlignment: 'right',
     searchFieldStyle: {},
     selection: false,
+    selectionProps: {},
     sorting: true,
     toolbar: true,
     defaultExpanded: false,
@@ -113,11 +119,13 @@ export const defaultProps = {
       editRow: {
         saveTooltip: 'Save',
         cancelTooltip: 'Cancel',
-        deleteText: 'Are you sure delete this row?',
+        deleteText: 'Are you sure you want to delete this row?',
       },
       addTooltip: 'Add',
       deleteTooltip: 'Delete',
       editTooltip: 'Edit'
     }
+  },
+  style: {
   }
 };

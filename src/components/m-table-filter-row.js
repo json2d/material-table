@@ -1,14 +1,21 @@
 /* eslint-disable no-unused-vars */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import {
-  TableCell, TableRow, TextField,
-  FormControl, Select, Input,
-  MenuItem, Checkbox, ListItemText,
-  InputAdornment, Icon, Tooltip,
-} from '@material-ui/core';
+import TableCell from '@material-ui/core/TableCell';
+import TableRow from '@material-ui/core/TableRow';
+import TextField from '@material-ui/core/TextField';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import Input from '@material-ui/core/Input';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import Checkbox from '@material-ui/core/Checkbox';
+import ListItemText from '@material-ui/core/ListItemText';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import Icon from '@material-ui/core/Icon';
+import Tooltip from '@material-ui/core/Tooltip';
 import DateFnsUtils from '@date-io/date-fns';
-import { MuiPickersUtilsProvider, TimePicker, DatePicker, DateTimePicker } from 'material-ui-pickers';
+import { MuiPickersUtilsProvider, TimePicker, DatePicker, DateTimePicker } from '@material-ui/pickers';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -24,6 +31,7 @@ const MenuProps = {
 class MTableFilterRow extends React.Component {
   renderLookupFilter = (columnDef) => (
     <FormControl style={{ width: '100%' }}>
+      <InputLabel htmlFor="select-multiple-checkbox">{columnDef.filterPlaceholder}</InputLabel>
       <Select
         multiple
         value={columnDef.tableData.filterValue || []}
@@ -70,6 +78,7 @@ class MTableFilterRow extends React.Component {
         style={columnDef.type === 'numeric' ? { float: 'right' } : {}}
         type={columnDef.type === 'numeric' ? 'number' : 'text'}
         value={columnDef.tableData.filterValue || ''}
+        placeholder={columnDef.filterPlaceholder || ''}
         onChange={(event) => {
           this.props.onFilterChanged(columnDef.tableData.id, event.target.value);
         }}
@@ -152,12 +161,9 @@ class MTableFilterRow extends React.Component {
       ));
 
     if (this.props.selection) {
-      columns.splice(0, 0, (
-        <TableCell padding="none" key="key-selection-column">
-          <Checkbox onChange={this.props.onFilterSelectionChanged} />
-        </TableCell>)
-      );
+      columns.splice(0, 0, <TableCell padding="none" key="key-selection-column"/>);
     }
+    
     if (this.props.emptyCell && this.props.hasActions) {
       if (this.props.actionsColumnIndex === -1) {
         columns.push(<TableCell key="key-action-column" />);
@@ -215,7 +221,6 @@ MTableFilterRow.propTypes = {
   onFilterChanged: PropTypes.func.isRequired,
   filterCellStyle: PropTypes.object,
   selection: PropTypes.bool.isRequired,
-  onFilterSelectionChanged: PropTypes.func.isRequired,
   actionsColumnIndex: PropTypes.number,
   hasActions: PropTypes.bool,
   localization: PropTypes.object

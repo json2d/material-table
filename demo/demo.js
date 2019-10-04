@@ -42,7 +42,7 @@ class App extends Component {
       { id: 1, name: 'A1', surname: 'B', isMarried: true, birthDate: new Date(1987, 1, 1), birthCity: 0, sex: 'Male', type: 'adult', insertDateTime: new Date(2018, 1, 1, 12, 23, 44), time: new Date(1900, 1, 1, 14, 23, 35) },
       { id: 2, name: 'A2', surname: 'B', isMarried: false, birthDate: new Date(1987, 1, 1), birthCity: 34, sex: 'Female', type: 'adult', insertDateTime: new Date(2018, 1, 1, 12, 23, 44), time: new Date(1900, 1, 1, 14, 23, 35), parentId: 1 },
       { id: 3, name: 'A3', surname: 'B', isMarried: true, birthDate: new Date(1987, 1, 1), birthCity: 34, sex: 'Female', type: 'child', insertDateTime: new Date(2018, 1, 1, 12, 23, 44), time: new Date(1900, 1, 1, 14, 23, 35), parentId: 1 },
-      { id: 4, name: 'A4', surname: 'C', isMarried: true, birthDate: new Date(1987, 1, 1), birthCity: 34, sex: 'Female', type: 'child', insertDateTime: new Date(2018, 1, 1, 12, 23, 44), time: new Date(1900, 1, 1, 14, 23, 35), parentId: 3 },
+      { id: 4, name: 'A4', surname: 'Dede', isMarried: true, birthDate: new Date(1987, 1, 1), birthCity: 34, sex: 'Female', type: 'child', insertDateTime: new Date(2018, 1, 1, 12, 23, 44), time: new Date(1900, 1, 1, 14, 23, 35), parentId: 3 },
       { id: 5, name: 'A5', surname: 'C', isMarried: false, birthDate: new Date(1987, 1, 1), birthCity: 34, sex: 'Female', type: 'child', insertDateTime: new Date(2018, 1, 1, 12, 23, 44), time: new Date(1900, 1, 1, 14, 23, 35) },
       { id: 6, name: 'A6', surname: 'C', isMarried: true, birthDate: new Date(1989, 1, 1), birthCity: 34, sex: 'Female', type: 'child', insertDateTime: new Date(2018, 1, 1, 12, 23, 44), time: new Date(1900, 1, 1, 14, 23, 35), parentId: 5 },
     ],
@@ -64,7 +64,7 @@ class App extends Component {
     remoteColumns: [
       { title: 'Avatar', field: 'avatar', render: rowData => <img style={{ height: 36, borderRadius: '50%' }} src={rowData.avatar} /> },
       { title: 'Id', field: 'id' },
-      { title: 'First Name', field: 'first_name' },
+      { title: 'First Name', field: 'first_name', defaultFilter: 'De' },
       { title: 'Last Name', field: 'last_name' },
     ],
     footerData: [
@@ -76,8 +76,6 @@ class App extends Component {
     return (
       <>
         <MuiThemeProvider theme={theme}>
-          <input type="text" value={this.state.text} onChange={e => this.setState({ text: e.target.value, colRenderCount: this.colRenderCount })} />
-          {this.state.colRenderCount}
           <div style={{ maxWidth: '100%', direction }}>
             <Grid container>
               <Grid item xs={12}>
@@ -98,7 +96,7 @@ class App extends Component {
               </Grid>
             </Grid>
             {this.state.text}
-            <button onClick={() => this.tableRef.current.onAllSelected(true)}>
+            <button onClick={() => this.tableRef.current.onAllSelected(true)} style={{ margin: 10 }}>
               Select
             </button>
             <MaterialTable
@@ -114,30 +112,31 @@ class App extends Component {
                     />
                   ),
                 },
-                { title: 'Id', field: 'id' },
+                { title: 'Id', field: 'id', filterPlaceholder: 'placeholder' },
                 { title: 'First Name', field: 'first_name' },
                 { title: 'Last Name', field: 'last_name' },
               ]}
               options={{
-                grouping: true
+                grouping: true,
+                filtering: true,
               }}
-              data={query =>
-                new Promise((resolve, reject) => {
-                  let url = 'https://reqres.in/api/users?'
-                  url += 'per_page=' + query.pageSize
-                  url += '&page=' + (query.page + 1)
-                  fetch(url)
-                    .then(response => response.json())
-                    .then(result => {
-                      resolve({
-                        data: result.data,
-                        page: result.page - 1,
-                        totalCount: result.total,
-                      })
+              data={query => new Promise((resolve, reject) => {
+                let url = 'https://reqres.in/api/users?'
+                url += 'per_page=' + query.pageSize
+                url += '&page=' + (query.page + 1)
+                console.log(query);
+                fetch(url)
+                  .then(response => response.json())
+                  .then(result => {
+                    resolve({
+                      data: result.data,
+                      page: result.page - 1,
+                      totalCount: result.total,
                     })
-                })
-              }
+                  })
+              })}
             />
+
           </div>
         </MuiThemeProvider>
       </>

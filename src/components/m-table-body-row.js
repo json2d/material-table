@@ -1,5 +1,10 @@
 /* eslint-disable no-unused-vars */
-import { Checkbox, TableCell, TableRow, IconButton, Icon, Tooltip } from '@material-ui/core';
+import Checkbox from '@material-ui/core/Checkbox';
+import TableCell from '@material-ui/core/TableCell';
+import TableRow from '@material-ui/core/TableRow';
+import IconButton from '@material-ui/core/IconButton';
+import Icon from '@material-ui/core/Icon';
+import Tooltip from '@material-ui/core/Tooltip';
 import PropTypes from 'prop-types';
 import * as React from 'react';
 /* eslint-enable no-unused-vars */
@@ -7,16 +12,18 @@ import * as React from 'react';
 
 export default class MTableBodyRow extends React.Component {
   renderColumns() {
+    const size = this.getElementSize();
     const mapArr = this.props.columns.filter(columnDef => !columnDef.hidden && !(columnDef.tableData.groupOrder > -1))
       .sort((a, b) => a.tableData.columnOrder - b.tableData.columnOrder)
       .map((columnDef, index) => {
         const value = this.props.getFieldValue(this.props.data, columnDef);
         return (
           <this.props.components.Cell
+            size={size}
             icons={this.props.icons}
             columnDef={columnDef}
             value={value}
-            key={"cell-" + this.props.data.tableData.di + "-" + columnDef.tableData.id}
+            key={"cell-" + this.props.data.tableData.id + "-" + columnDef.tableData.id}
             rowData={this.props.data}
           />
         );
@@ -25,26 +32,43 @@ export default class MTableBodyRow extends React.Component {
   }
 
   renderActions() {
+    const size = this.getElementSize();
+    const baseIconSize = size === 'medium' ? 42 : 26;
     const actions = this.props.actions.filter(a => !a.isFreeAction && !this.props.options.selection);
     return (
-      <TableCell padding="none" key="key-actions-column" style={{ width: 48 * actions.length, padding: '0px 5px', ...this.props.options.actionsCellStyle }}>
+      <TableCell size={size} padding="none" key="key-actions-column" style={{ width: baseIconSize * actions.length, padding: '0px 5px', ...this.props.options.actionsCellStyle }}>
         <div style={{ display: 'flex' }}>
-          <this.props.components.Actions data={this.props.data} actions={actions} components={this.props.components} />
+          <this.props.components.Actions data={this.props.data} actions={actions} components={this.props.components} size={size} />
         </div>
       </TableCell>
     );
   }
   renderSelectionColumn() {
+    let checkboxProps = this.props.options.selectionProps || {};
+    if (typeof checkboxProps === 'function') {
+      checkboxProps = checkboxProps(this.props.data);
+    }
+
+    const size = this.getElementSize();
+    const baseIconSize = size === 'medium' ? 42 : 26;
+
+    const styles = size === 'medium' ? {
+      marginLeft: this.props.level * 9
+    } : {
+        padding: "4px",
+        marginLeft: 5 + this.props.level * 9
+      };
+
     return (
-      <TableCell padding="none" key="key-selection-column" style={{ width: 48 + 12 * (this.props.treeDataMaxLevel - 1) }}>
+      <TableCell size={this.getElementSize()} padding="none" key="key-selection-column" style={{ width: baseIconSize + 9 * (this.props.treeDataMaxLevel - 1) }}>
         <Checkbox
+          size={size}
           checked={this.props.data.tableData.checked === true}
           onClick={(e) => e.stopPropagation()}
           value={this.props.data.tableData.id.toString()}
           onChange={(event) => this.props.onRowSelected(event, this.props.path, this.props.data)}
-          style={{
-            paddingLeft: 12 + this.props.level * 12
-          }}
+          style={styles}
+          {...checkboxProps}
         />
       </TableCell>
     );
@@ -60,8 +84,9 @@ export default class MTableBodyRow extends React.Component {
 
     if (typeof this.props.detailPanel == 'function') {
       return (
-        <TableCell padding="none" key="key-detail-panel-column" style={{ width: 48, textAlign: 'center' }}>
+        <TableCell size={this.getElementSize()} padding="none" key="key-detail-panel-column" style={{ width: 42, textAlign: 'center' }}>
           <IconButton
+            size={this.getElementSize()}
             style={{ transition: 'all ease 200ms', ...this.rotateIconStyle(this.props.data.tableData.showDetailPanel) }}
             onClick={(event) => {
               this.props.onToggleDetailPanel(this.props.path, this.props.detailPanel);
@@ -75,8 +100,8 @@ export default class MTableBodyRow extends React.Component {
     }
     else {
       return (
-        <TableCell padding="none" key="key-detail-panel-column">
-          <div style={{ width: 48 * this.props.detailPanel.length, textAlign: 'center', display: 'inline-block' }}>
+        <TableCell size={this.getElementSize()} padding="none" key="key-detail-panel-column">
+          <div style={{ width: 42 * this.props.detailPanel.length, textAlign: 'center', display: 'flex' }}>
             {this.props.detailPanel.map((panel, index) => {
 
               if (typeof panel === "function") {
@@ -103,6 +128,7 @@ export default class MTableBodyRow extends React.Component {
 
               iconButton = (
                 <IconButton
+                  size={this.getElementSize()}
                   key={"key-detail-panel-" + index}
                   style={{ transition: 'all ease 200ms', ...this.rotateIconStyle(animation && isOpen) }}
                   disabled={panel.disabled}
@@ -126,7 +152,7 @@ export default class MTableBodyRow extends React.Component {
     }
   }
 
-  getStyle() {
+  getStyle(index, level) {
     let style = {
       transition: 'all ease 300ms',
     };
@@ -134,7 +160,7 @@ export default class MTableBodyRow extends React.Component {
     if (typeof this.props.options.rowStyle === "function") {
       style = {
         ...style,
-        ...this.props.options.rowStyle(this.props.data)
+        ...this.props.options.rowStyle(this.props.data, index, level)
       };
     }
     else if (this.props.options.rowStyle) {
@@ -153,6 +179,10 @@ export default class MTableBodyRow extends React.Component {
     }
 
     return style;
+  }
+
+  getElementSize = () => {
+    return this.props.options.padding === 'default' ? 'medium' : 'small';
   }
 
   render() {
@@ -175,11 +205,12 @@ export default class MTableBodyRow extends React.Component {
     if (this.props.isTreeData) {
       if (this.props.data.tableData.childRows && this.props.data.tableData.childRows.length > 0) {
         renderColumns.splice(0, 0, (
-          <TableCell padding="none" key={"key-tree-data-column"} style={{ width: 48 + 12 * (this.props.treeDataMaxLevel - 2) }}>
+          <TableCell size={this.getElementSize()} padding="none" key={"key-tree-data-column"} style={{ width: 48 + 9 * (this.props.treeDataMaxLevel - 2) }}>
             <IconButton
+              size={this.getElementSize()}
               style={{
                 transition: 'all ease 200ms',
-                marginLeft: this.props.level * 12,
+                marginLeft: this.props.level * 9,
                 ...this.rotateIconStyle(this.props.data.tableData.isTreeExpanded)
               }}
               onClick={(event) => {
@@ -209,7 +240,7 @@ export default class MTableBodyRow extends React.Component {
     this.props.columns
       .filter(columnDef => columnDef.tableData.groupOrder > -1)
       .forEach(columnDef => {
-        renderColumns.splice(0, 0, <TableCell padding="none" key={"key-group-cell" + columnDef.tableData.id} />);
+        renderColumns.splice(0, 0, <TableCell size={this.getElementSize()} padding="none" key={"key-group-cell" + columnDef.tableData.id} />);
       });
 
     const {
@@ -237,13 +268,17 @@ export default class MTableBodyRow extends React.Component {
           selected={hasAnyEditingRow}
           {...rowProps}
           hover={onRowClick ? true : false}
-          style={this.getStyle()}
+          style={this.getStyle(this.props.index, this.props.level)}
           onClick={(event) => {
             onRowClick && onRowClick(event, this.props.data,
               (panelIndex) => {
                 let panel = detailPanel;
                 if (Array.isArray(panel)) {
-                  panel = panel[panelIndex || 0].render;
+                  panel = panel[panelIndex || 0];
+                  if (typeof panel === "function") {
+                    panel = panel(this.props.data);
+                  }
+                  panel = panel.render;
                 }
 
                 onToggleDetailPanel(this.props.path, panel);
@@ -293,7 +328,7 @@ export default class MTableBodyRow extends React.Component {
           <TableRow
           // selected={this.props.index % 2 === 0}
           >
-            <TableCell colSpan={renderColumns.length} padding="none">
+            <TableCell size={this.getElementSize()} colSpan={renderColumns.length} padding="none">
               {this.props.data.tableData.showDetailPanel(this.props.data)}
             </TableCell>
           </TableRow>

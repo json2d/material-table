@@ -1,10 +1,12 @@
 /* eslint-disable no-unused-vars */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import {
-  TableHead, TableRow, TableCell,
-  TableSortLabel, Checkbox, withStyles
-} from '@material-ui/core';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import TableCell from '@material-ui/core/TableCell';
+import TableSortLabel from '@material-ui/core/TableSortLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+import withStyles from '@material-ui/core/styles/withStyles';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 /* eslint-enable no-unused-vars */
 
@@ -13,51 +15,44 @@ export class MTableHeader extends React.Component {
     const mapArr = this.props.columns.filter(columnDef => !columnDef.hidden && !(columnDef.tableData.groupOrder > -1))
       .sort((a, b) => a.tableData.columnOrder - b.tableData.columnOrder)
       .map((columnDef, index) => {
-        let content = (
-          <Draggable
-            key={columnDef.tableData.id}
-            draggableId={columnDef.tableData.id.toString()}
-            index={index}>
-            {(provided, snapshot) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.draggableProps}
-                {...provided.dragHandleProps}
-              // style={this.getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
-              >
-                {columnDef.title}
-              </div>
-            )}
-          </Draggable>
-        );
+        let content = columnDef.title;
 
-        // if (this.props.grouping && columnDef.grouping !== false && columnDef.field) {
-        //   content = (
-        //     <Draggable
-        //       key={columnDef.tableData.id}
-        //       draggableId={columnDef.tableData.id.toString()}
-        //       index={index}>
-        //       {(provided, snapshot) => (
-        //         <div
-        //           ref={provided.innerRef}
-        //           {...provided.draggableProps}
-        //           {...provided.dragHandleProps}
-        //         // style={this.getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
-        //         >
-        //           {columnDef.title}
-        //         </div>
-        //       )}
-        //     </Draggable>
-        //   );
-        // }
+        if(this.props.draggable) {
+          content = (
+            <Draggable
+              key={columnDef.tableData.id}
+              draggableId={columnDef.tableData.id.toString()}
+              index={index}>
+              {(provided, snapshot) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.draggableProps}
+                  {...provided.dragHandleProps}
+                >
+                  {columnDef.title}
+                </div>
+              )}
+            </Draggable>
+          );
+        }
 
         if (columnDef.sorting !== false && this.props.sorting) {
           content = (
             <TableSortLabel
+              IconComponent={this.props.icons.SortArrow}
               active={this.props.orderBy === columnDef.tableData.id}
               direction={this.props.orderDirection || 'asc'}
               onClick={() => {
-                const orderDirection = columnDef.tableData.id !== this.props.orderBy ? 'asc' : this.props.orderDirection === 'asc' ? 'desc' : 'asc';
+                const orderDirection =
+                  columnDef.tableData.id !== this.props.orderBy
+                    ? 'asc'
+                    : this.props.orderDirection === 'asc'
+                    ? 'desc'
+                    : this.props.orderDirection === 'desc'
+                    ? ''
+                    : this.props.orderDirection === ''
+                    ? 'asc'
+                    : 'desc';
                 this.props.onOrderChange(columnDef.tableData.id, orderDirection);
               }}
             >
@@ -186,7 +181,8 @@ MTableHeader.defaultProps = {
   orderBy: undefined,
   orderDirection: 'asc',
   actionsHeaderIndex: 0,
-  detailPanelColumnAlignment: "left"
+  detailPanelColumnAlignment: "left",
+  draggable: true,
 };
 
 MTableHeader.propTypes = {
@@ -206,6 +202,7 @@ MTableHeader.propTypes = {
   actionsHeaderIndex: PropTypes.number,
   showActionsColumn: PropTypes.bool,
   showSelectAllCheckbox: PropTypes.bool,
+  draggable: PropTypes.bool,
 };
 
 

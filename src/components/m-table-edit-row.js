@@ -1,5 +1,7 @@
 /* eslint-disable no-unused-vars */
-import { Checkbox, TableCell, TableRow, IconButton, Icon, Tooltip, Typography } from '@material-ui/core';
+import TableCell from '@material-ui/core/TableCell';
+import TableRow from '@material-ui/core/TableRow';
+import Typography from '@material-ui/core/Typography';
 import PropTypes from 'prop-types';
 import * as React from 'react';
 import { byString, setByString } from '../utils';
@@ -12,12 +14,20 @@ export default class MTableEditRow extends React.Component {
     super(props);
 
     this.state = {
-      data: props.data ? JSON.parse(JSON.stringify(props.data)) : {}
+      data: props.data ? JSON.parse(JSON.stringify(props.data)) : this.createRowData()
     };
+  }
+
+  createRowData(){
+    return this.props.columns.filter(column=>column.initialEditValue && column.field).reduce((prev,column)=>{
+      prev[column.field]=column.initialEditValue;
+      return prev;
+    },{});
   }
 
   renderColumns() {
     const mapArr = this.props.columns.filter(columnDef => !columnDef.hidden && !(columnDef.tableData.groupOrder > -1))
+      .sort((a, b) => a.tableData.columnOrder - b.tableData.columnOrder)
       .map((columnDef, index) => {
         const value = (typeof this.state.data[columnDef.field] !== 'undefined' ? this.state.data[columnDef.field] : byString(this.state.data, columnDef.field));
         const style = {};
@@ -39,13 +49,16 @@ export default class MTableEditRow extends React.Component {
         if (columnDef.editable === 'onUpdate' && this.props.mode === 'update') {
           allowEditing = true;
         }
-
+        if (typeof columnDef.editable == 'function'){
+            allowEditing = columnDef.editable(columnDef, this.props.data);
+        }
         if (!columnDef.field || !allowEditing) {
+          const readonlyValue = this.props.getFieldValue(this.state.data, columnDef);
           return (
             <this.props.components.Cell
               icons={this.props.icons}
               columnDef={columnDef}
-              value={value}
+              value={readonlyValue}
               key={columnDef.tableData.id}
               rowData={this.props.data}
             />
@@ -63,13 +76,17 @@ export default class MTableEditRow extends React.Component {
                 key={columnDef.tableData.id}
                 columnDef={cellProps}
                 value={value}
-                rowData={this.props.data}
+                rowData={this.state.data}
                 onChange={value => {
                   const data = { ...this.state.data };
                   setByString(data, columnDef.field, value);
                   // data[columnDef.field] = value;
                   this.setState({ data });
-                }} />
+                }}
+                onRowDataChange={data => {
+                  this.setState({ data });
+                }}
+              />
             </TableCell>
           );
         }
@@ -98,7 +115,7 @@ export default class MTableEditRow extends React.Component {
       }
     ];
     return (
-      <TableCell padding="none" key="key-actions-column" style={{ width: 48 * actions.length, padding: '0px 5px' }}>
+      <TableCell padding="none" key="key-actions-column" style={{ width: 42 * actions.length, padding: '0px 5px' }}>
         <div style={{ display: 'flex' }}>
           <this.props.components.Actions data={this.props.data} actions={actions} components={this.props.components} />
         </div>
@@ -162,7 +179,9 @@ export default class MTableEditRow extends React.Component {
 
     // Lastly we add detail panel icon
     if (this.props.detailPanel) {
-      columns.splice(0, 0, <TableCell padding="none" key="key-detail-panel-cell" />);
+      const aligment = this.props.options.detailPanelColumnAlignment;
+      const index = aligment === "left" ? 0 : columns.length;
+      columns.splice(index, 0, <TableCell padding="none" key="key-detail-panel-cell" />);
     }
 
     this.props.columns
@@ -180,6 +199,7 @@ export default class MTableEditRow extends React.Component {
       onToggleDetailPanel,
       onEditingApproved,
       onEditingCanceled,
+      getFieldValue,
       ...rowProps
     } = this.props;
 
@@ -204,7 +224,7 @@ MTableEditRow.defaultProps = {
   localization: {
     saveTooltip: 'Save',
     cancelTooltip: 'Cancel',
-    deleteText: 'Are you sure delete this row?',
+    deleteText: 'Are you sure you want to delete this row?',
   }
 };
 
@@ -221,5 +241,6 @@ MTableEditRow.propTypes = {
   onRowClick: PropTypes.func,
   onEditingApproved: PropTypes.func,
   onEditingCanceled: PropTypes.func,
-  localization: PropTypes.object
+  localization: PropTypes.object,
+  getFieldValue: PropTypes.func
 };
